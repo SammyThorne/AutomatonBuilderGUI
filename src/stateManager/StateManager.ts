@@ -1,19 +1,20 @@
-import NodeWrapper from "./NodeWrapper";
-import CommentRegion from "./CommentRegion";
-import { Tool } from "./Tool";
+import NodeWrapper from "../NodeWrapper";
+import CommentRegion from "../CommentRegion";
+import { Tool } from "../Tool";
 import Konva from "konva";
-import TransitionWrapper from "./TransitionWrapper";
-import SelectableObject from "./SelectableObject";
-import TokenWrapper from "./TokenWrapper";
+import TransitionWrapper from "../TransitionWrapper";
+import SelectableObject from "../SelectableObject";
+import TokenWrapper from "../TokenWrapper";
 import { ChangeEvent } from "react";
-import { LightColorScheme, DarkColorScheme } from "./ColorSchemes";
+import { LightColorScheme, DarkColorScheme } from "../ColorSchemes";
 import DFA from "automaton-kit/lib/dfa/DFA";
 import DFATransition from "automaton-kit/lib/dfa/DFATransition";
 import DFAState from "automaton-kit/lib/dfa/DFAState";
-import { convertIDtoLabelOrSymbol } from "./utilities/AutomatonUtilities";
-import UndoRedoManager, { Action, ActionData } from "./UndoRedoManager";
+import { convertIDtoLabelOrSymbol } from "../utilities/AutomatonUtilities";
+import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import { Vector2d } from "konva/lib/types";
 import { KonvaEventObject } from "konva/lib/Node";
+import setNodesIsAccept from "./StackableAction";
 
 /**
  * The "engine" behind the Automaton Builder GUI. It handles a lot of the
@@ -111,6 +112,10 @@ export default class StateManager {
   /** Keeps track of the current file to see if it has had changes without saves. */
   private static clean: boolean = true;
   private static debugActive: boolean = false;
+
+  public static isDebugEnabled(): boolean {
+    return this.debugActive;
+  }
 
   /** Returns UI configuration information for the current color scheme. */
   public static get colorScheme() {
@@ -910,46 +915,6 @@ export default class StateManager {
       { oldName: oldName, newName: newName, node: node },
     );
     UndoRedoManager.pushAction(setNodeNameAction);
-  }
-
-  /**
-   * Pushes an action to the action stack that sets the accept status of the
-   * given nodes.
-   * @param nodes The nodes to set the accept status of.
-   * @param isAccept Whether or not the given nodes should be an accepting node.
-   */
-  public static setNodesIsAccept(nodes: NodeWrapper[], isAccept: boolean) {
-    if (this.debugActive) return;
-    let oldValues = nodes.map((node) => node.isAcceptNode);
-
-    let setNodesIsAcceptForward = (data: SetNodesIsAcceptActionData) => {
-      data.nodes.forEach((node) => {
-        node.isAcceptNode = data.newValue;
-      });
-    };
-
-    let setNodesIsAcceptBackward = (data: SetNodesIsAcceptActionData) => {
-      data.nodes.forEach((node, i) => {
-        node.isAcceptNode = data.oldValues[i];
-      });
-    };
-
-    let actionStackLabel;
-
-    if (nodes.length == 1) {
-      actionStackLabel = `Mark "${nodes[0].labelText}" As ${isAccept ? "Accepting" : "Rejecting"}`;
-    } else {
-      actionStackLabel = `Mark ${nodes.length} Selected States As ${isAccept ? "Accepting" : "Rejecting"}`;
-    }
-
-    let setNodesIsAcceptAction = new Action(
-      "setNodesIsAccept",
-      actionStackLabel,
-      setNodesIsAcceptForward,
-      setNodesIsAcceptBackward,
-      { oldValues: oldValues, newValue: isAccept, nodes: nodes },
-    );
-    UndoRedoManager.pushAction(setNodesIsAcceptAction);
   }
 
   /**
@@ -3042,18 +3007,6 @@ class SetNodeNameActionData extends ActionData {
 
   /** The node renamed in this action. */
   public node: NodeWrapper;
-}
-
-/** Holds the data associated with a "set nodes is accept node" action. */
-class SetNodesIsAcceptActionData extends ActionData {
-  /** Whether or not the old nodes were an accept node before this action. */
-  public oldValues: boolean[];
-
-  /** Whether or not the nodes were an accept node after this action. */
-  public newValue: boolean;
-
-  /** The nodes to set the accept status of in this action. */
-  public nodes: NodeWrapper[];
 }
 
 /** Holds the data associated with a "set node as start node" action. */

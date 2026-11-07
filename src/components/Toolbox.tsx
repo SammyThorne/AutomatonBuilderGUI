@@ -1,6 +1,6 @@
 import { Tool } from "../Tool";
 import ToolButton from "./ToolButton";
-import StateManager from "../StateManager";
+import StateManager from "../stateManager/StateManager";
 import { useRef } from "react";
 import { useState } from "react";
 import { ChangeEvent } from "react";

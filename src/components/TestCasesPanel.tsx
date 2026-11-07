@@ -1,5 +1,5 @@
 import { ChangeEvent, useRef, useState } from "react";
-import StateManager from "../StateManager";
+import StateManager from "../stateManager/StateManager";
 import { IconContext } from "react-icons";
 import { BsCheckCircleFill, BsXCircleFill } from "react-icons/bs";
 import { testStringOnAutomata } from "./TestStringOnAutomata";

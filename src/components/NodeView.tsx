@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import StateManager from "../StateManager";
+import StateManager from "../stateManager/StateManager";
 
 interface NodeViewProps {}
 
