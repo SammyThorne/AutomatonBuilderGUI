@@ -32,7 +32,7 @@ class MoveStatesActionData extends ActionData {
 
 export default class StackableAction {
   /** The initial position of one of the nodes when nodes are dragged. */
-  private static _dragStatesStartPosition: Vector2d | null = null;
+  static _dragStatesStartPosition: Vector2d | null = null;
 
   /**
    * Updates the position of the start node arrow to align with the

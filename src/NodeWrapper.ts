@@ -4,6 +4,7 @@ import { Tool } from "./Tool";
 import { Vector2d } from "konva/lib/types";
 import SelectableObject from "./SelectableObject";
 import { v4 as uuidv4 } from "uuid";
+import StackableAction from "./stateManager/StackableAction";
 
 /**
  * The class that holds node information (label, start node status, etc)
@@ -505,7 +506,7 @@ export default class NodeWrapper extends SelectableObject {
         node.dragHighlightEffectDisable();
       });
 
-      StateManager.updateStartNodePosition();
+      StackableAction.updateStartNodePosition();
 
       // only add the move to the action stack if our snapped position changed
       if (
@@ -513,7 +514,7 @@ export default class NodeWrapper extends SelectableObject {
         Math.abs(this.lastSnappedPos.y - snappedPos.y) > 1e-5
       ) {
         this.lastSnappedPos = snappedPos;
-        StateManager.completeDragStatesOperation(this.nodeGroup.position());
+        StackableAction.completeDragStatesOperation(this.nodeGroup.position());
       }
     } else if (StateManager.currentTool === Tool.Transitions) {
       // Handling specific to ending a tentative transition
@@ -526,7 +527,7 @@ export default class NodeWrapper extends SelectableObject {
         }
       });
 
-      StateManager.completeDragStatesOperation(this.nodeGroup.position());
+      StackableAction.completeDragStatesOperation(this.nodeGroup.position());
     }
   }
 

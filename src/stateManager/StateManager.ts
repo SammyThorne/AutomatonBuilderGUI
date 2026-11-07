@@ -15,6 +15,7 @@ import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import { Vector2d } from "konva/lib/types";
 import { KonvaEventObject } from "konva/lib/Node";
 import setNodesIsAccept from "./StackableAction";
+import StackableAction from "./StackableAction";
 
 /**
  * The "engine" behind the Automaton Builder GUI. It handles a lot of the
@@ -32,7 +33,7 @@ export default class StateManager {
   public static get startNode(): NodeWrapper | null {
     return StateManager._startNode;
   }
-  private static _startNode: NodeWrapper | null = null;
+  static _startNode: NodeWrapper | null = null;
 
   /** Holds all of the node wrappers in the automaton. */
   private static _nodeWrappers: Array<NodeWrapper> = [];
@@ -78,7 +79,7 @@ export default class StateManager {
   private static _tentConnectionLine: Konva.Arrow | null = null;
 
   /** The arrow used to represent the start node. */
-  private static _startStateLine: Konva.Arrow | null = null;
+  static _startStateLine: Konva.Arrow | null = null;
 
   /** The layer of the Konva stage that draws the selection box (and perhaps other temporary constructs)*/
   private static _selectBoxLayer: Konva.Layer | null = null;
@@ -959,9 +960,9 @@ export default class StateManager {
 
     if (node) {
       node.nodeGroup.on("move.startstate", (ev) =>
-        StateManager.updateStartNodePosition(),
+        StackableAction.updateStartNodePosition(),
       );
-      StateManager.updateStartNodePosition();
+      StackableAction.updateStartNodePosition();
       StateManager._startStateLine.visible(true);
     } else {
       StateManager._startStateLine.visible(false);
@@ -2681,7 +2682,7 @@ export default class StateManager {
    * @param startPos The initial position of one of the nodes.
    */
   public static startDragStatesOperation(startPos: Vector2d) {
-    this._dragStatesStartPosition = startPos;
+    StackableAction._dragStatesStartPosition = startPos;
   }
 
   /** The initial position of one of the comment regions when comments are dragged. */
