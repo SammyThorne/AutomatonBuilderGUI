@@ -7,6 +7,7 @@
 import NodeWrapper from "../NodeWrapper";
 import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import StateManager from "./StateManager";
+import { Vector2d } from "konva/lib/types";
 
 /** Holds the data associated with a "set nodes is accept node" action. */
 class SetNodesIsAcceptActionData extends ActionData {
@@ -20,7 +21,29 @@ class SetNodesIsAcceptActionData extends ActionData {
   public nodes: NodeWrapper[];
 }
 
+/** Holds the data associated with a "move nodes" action. */
+class MoveStatesActionData extends ActionData {
+  /** The amount by which nodes were moved in this action. */
+  public delta: Vector2d;
+
+  /** The nodes moved in this action. */
+  public states: Array<NodeWrapper>;
+}
+
 export default class StackableAction {
+  /** The initial position of one of the nodes when nodes are dragged. */
+  private static _dragStatesStartPosition: Vector2d | null = null;
+
+  /**
+   * Updates the position of the start node arrow to align with the
+   * automaton's start node.
+   */
+  public static updateStartNodePosition() {
+    StateManager._startStateLine.absolutePosition(
+      StateManager._startNode.nodeGroup.absolutePosition(),
+    );
+  }
+
   public static setNodesIsAccept(nodes: NodeWrapper[], isAccept: boolean) {
     if (StateManager.isDebugEnabled()) return;
     const oldValues = nodes.map((node) => node.isAcceptNode);
@@ -53,5 +76,67 @@ export default class StackableAction {
       { oldValues: oldValues, newValue: isAccept, nodes: nodes },
     );
     UndoRedoManager.pushAction(setNodesIsAcceptAction);
+  }
+
+  /**
+   * Pushes an action to the action stack that moves the selected nodes
+   * by a certain amount.
+   * @param finalPos The final position of the same node as was used for
+   * `StateManager.startDragStatesOperation` at the beginning of this drag
+   * operation.
+   */
+  public static completeDragStatesOperation(finalPos: Vector2d) {
+    const startPos = this._dragStatesStartPosition;
+    const endPos = finalPos;
+    const delta: Vector2d = {
+      x: endPos.x - startPos.x,
+      y: endPos.y - startPos.y,
+    };
+
+    const moveStatesForward = (data: MoveStatesActionData) => {
+      data.states.forEach((state) => {
+        state.setPosition({
+          x: state.nodeGroup.position().x + delta.x,
+          y: state.nodeGroup.position().y + delta.y,
+        });
+
+        if (StateManager.startNode === state) {
+          this.updateStartNodePosition();
+        }
+      });
+      StateManager.updateTransitions();
+    };
+
+    let moveStatesBackward = (data: MoveStatesActionData) => {
+      data.states.forEach((state) => {
+        state.setPosition({
+          x: state.nodeGroup.position().x - delta.x,
+          y: state.nodeGroup.position().y - delta.y,
+        });
+
+        if (StateManager.startNode === state) {
+          this.updateStartNodePosition();
+        }
+      });
+      StateManager.updateTransitions();
+    };
+
+    let moveStatesString = "Move ";
+    if (StateManager.selectedObjects.length > 1) {
+      moveStatesString += `${StateManager.selectedObjects.length} Nodes`;
+    } else if (StateManager.selectedObjects.length == 1) {
+      const singleState = StateManager.selectedObjects[0] as NodeWrapper;
+      moveStatesString += `"${singleState.labelText}"`;
+    }
+
+    const moveNodesAction = new Action(
+      "moveStates",
+      moveStatesString,
+      moveStatesForward,
+      moveStatesBackward,
+      { delta: delta, states: [...StateManager.selectedObjects] },
+    );
+
+    UndoRedoManager.pushAction(moveNodesAction, false);
   }
 }

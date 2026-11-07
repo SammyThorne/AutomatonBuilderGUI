@@ -968,16 +968,6 @@ export default class StateManager {
     }
   }
 
-  /**
-   * Updates the position of the start node arrow to align with the
-   * automaton's start node.
-   */
-  public static updateStartNodePosition() {
-    StateManager._startStateLine.absolutePosition(
-      StateManager._startNode.nodeGroup.absolutePosition(),
-    );
-  }
-
   public static setCommentRegionColor(
     comments: CommentRegion[],
     newColor: string,
@@ -2682,9 +2672,6 @@ export default class StateManager {
     return this._useDarkMode;
   }
 
-  /** The initial position of one of the nodes when nodes are dragged. */
-  private static _dragStatesStartPosition: Vector2d | null = null;
-
   /**
    * Stores the initial position of one of the nodes at the beginning of a
    * node-dragging operation. This value is compared to the same node's
@@ -2695,68 +2682,6 @@ export default class StateManager {
    */
   public static startDragStatesOperation(startPos: Vector2d) {
     this._dragStatesStartPosition = startPos;
-  }
-
-  /**
-   * Pushes an action to the action stack that moves the selected nodes
-   * by a certain amount.
-   * @param finalPos The final position of the same node as was used for
-   * `StateManager.startDragStatesOperation` at the beginning of this drag
-   * operation.
-   */
-  public static completeDragStatesOperation(finalPos: Vector2d) {
-    let startPos = this._dragStatesStartPosition;
-    let endPos = finalPos;
-    let delta: Vector2d = {
-      x: endPos.x - startPos.x,
-      y: endPos.y - startPos.y,
-    };
-
-    let moveStatesForward = (data: MoveStatesActionData) => {
-      data.states.forEach((state) => {
-        state.setPosition({
-          x: state.nodeGroup.position().x + delta.x,
-          y: state.nodeGroup.position().y + delta.y,
-        });
-
-        if (StateManager.startNode === state) {
-          this.updateStartNodePosition();
-        }
-      });
-      StateManager.updateTransitions();
-    };
-
-    let moveStatesBackward = (data: MoveStatesActionData) => {
-      data.states.forEach((state) => {
-        state.setPosition({
-          x: state.nodeGroup.position().x - delta.x,
-          y: state.nodeGroup.position().y - delta.y,
-        });
-
-        if (StateManager.startNode === state) {
-          this.updateStartNodePosition();
-        }
-      });
-      StateManager.updateTransitions();
-    };
-
-    let moveStatesString = "Move ";
-    if (this.selectedObjects.length > 1) {
-      moveStatesString += `${this.selectedObjects.length} Nodes`;
-    } else if (this.selectedObjects.length == 1) {
-      let singleState = this.selectedObjects[0] as NodeWrapper;
-      moveStatesString += `"${singleState.labelText}"`;
-    }
-
-    let moveNodesAction = new Action(
-      "moveStates",
-      moveStatesString,
-      moveStatesForward,
-      moveStatesBackward,
-      { delta: delta, states: [...this.selectedObjects] },
-    );
-
-    UndoRedoManager.pushAction(moveNodesAction, false);
   }
 
   /** The initial position of one of the comment regions when comments are dragged. */
@@ -2986,15 +2911,6 @@ class RemoveNodeActionDataMulti extends ActionData {
 
   /** Whether any of the nodes removed were the start node. */
   public wasStartNode: boolean = false;
-}
-
-/** Holds the data associated with a "move nodes" action. */
-class MoveStatesActionData extends ActionData {
-  /** The amount by which nodes were moved in this action. */
-  public delta: Vector2d;
-
-  /** The nodes moved in this action. */
-  public states: Array<NodeWrapper>;
 }
 
 /** Holds the data associated with a "set node name" action. */
