@@ -14,8 +14,9 @@ import { convertIDtoLabelOrSymbol } from "../utilities/AutomatonUtilities";
 import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import { Vector2d } from "konva/lib/types";
 import { KonvaEventObject } from "konva/lib/Node";
-import setNodesIsAccept from "./StackableAction";
-import StackableAction from "./StackableAction";
+import { SetNodesIsAcceptActionData } from "./StackableAction";
+import { StackableAction } from "./StackableAction";
+import { ResizeCommentActionData } from "./StackableAction";
 
 /**
  * The "engine" behind the Automaton Builder GUI. It handles a lot of the
@@ -3048,16 +3049,4 @@ class SetCommentsTextActionData extends ActionData {
   public newText: string;
 
   public comments: CommentRegion[];
-}
-
-/** Holds the data associated with a "resize comment" action. */
-class ResizeCommentActionData extends ActionData {
-  /** The old size before the action was taken */
-  public oldSize: Vector2d;
-
-  /** The old position before the action was taken */
-  public oldPos: Vector2d;
-
-  /** The comment being resized in this action. */
-  public comment: CommentRegion;
 }

@@ -8,9 +8,10 @@ import NodeWrapper from "../NodeWrapper";
 import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import StateManager from "./StateManager";
 import { Vector2d } from "konva/lib/types";
+import CommentRegion from "../CommentRegion";
 
 /** Holds the data associated with a "set nodes is accept node" action. */
-class SetNodesIsAcceptActionData extends ActionData {
+export class SetNodesIsAcceptActionData extends ActionData {
   /** Whether or not the old nodes were an accept node before this action. */
   public oldValues: boolean[];
 
@@ -30,7 +31,7 @@ class MoveStatesActionData extends ActionData {
   public states: Array<NodeWrapper>;
 }
 
-export default class StackableAction {
+export class StackableAction {
   /** The initial position of one of the nodes when nodes are dragged. */
   static _dragStatesStartPosition: Vector2d | null = null;
 
@@ -139,4 +140,16 @@ export default class StackableAction {
 
     UndoRedoManager.pushAction(moveNodesAction, false);
   }
+}
+
+/** Holds the data associated with a "resize comment" action. */
+export class ResizeCommentActionData extends ActionData {
+  /** The old size before the action was taken */
+  public oldSize: Vector2d;
+
+  /** The old position before the action was taken */
+  public oldPos: Vector2d;
+
+  /** The comment being resized in this action. */
+  public comment: CommentRegion;
 }

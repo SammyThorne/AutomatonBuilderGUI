@@ -4,7 +4,7 @@ import { Tool } from "./Tool";
 import { Vector2d } from "konva/lib/types";
 import SelectableObject from "./SelectableObject";
 import { v4 as uuidv4 } from "uuid";
-import StackableAction from "./stateManager/StackableAction";
+import { StackableAction } from "./stateManager/StackableAction";
 
 /**
  * The class that holds node information (label, start node status, etc)

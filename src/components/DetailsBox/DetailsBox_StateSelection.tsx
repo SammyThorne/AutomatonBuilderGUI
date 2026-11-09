@@ -4,7 +4,7 @@ import SelectableObject from "../../SelectableObject";
 import StateManager from "../../stateManager/StateManager";
 import { useActionStack } from "../../utilities/ActionStackUtilities";
 import { CoreListItem, CoreListItem_Left, ListItem } from "../ListItem";
-import StackableAction from "../../stateManager/StackableAction";
+import { StackableAction } from "../../stateManager/StackableAction";
 
 interface DetailsBox_StateSelectionProps {
   nodeWrappers: NodeWrapper[];
