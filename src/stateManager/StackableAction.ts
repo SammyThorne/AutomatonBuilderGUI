@@ -9,6 +9,8 @@ import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import StateManager from "./StateManager";
 import { Vector2d } from "konva/lib/types";
 import CommentRegion from "../CommentRegion";
+import TransitionWrapper from "../TransitionWrapper";
+import TokenWrapper from "../TokenWrapper";
 
 /** Holds the data associated with a "set nodes is accept node" action. */
 export class SetNodesIsAcceptActionData extends ActionData {
@@ -183,4 +185,67 @@ export class SetCommentsColorActionData extends ActionData {
   public newColor: string;
 
   public comments: CommentRegion[];
+}
+
+/** Holds the data associated with a "paste" action. */
+export class PasteActionData extends ActionData {
+  /** The nodes created in this action. */
+  public nodes: NodeWrapper[] = [];
+
+  /** The transitions created in this action. */
+  public transitions: TransitionWrapper[] = [];
+}
+
+/** Holds the data associated with a "cut" action. */
+export class CutActionData extends ActionData {
+  /** The nodes removed in this action. */
+  public nodes: NodeWrapper[] = [];
+
+  /** The transitions removed in this action. */
+  public transitions: TransitionWrapper[] = [];
+
+  /** Whether any of the nodes removed were the start node. */
+  public wasStartNode: boolean = false;
+}
+
+/** Holds the data associated with a "create comment" action. */
+export class CreateCommentActionData extends ActionData {
+  /** The X coordinate where the comment region is created. */
+  public x: number;
+
+  /** The Y coordinate where the comment region is created. */
+  public y: number;
+
+  /** The comment region created in this action. */
+  public commentRegion: CommentRegion;
+}
+
+/** Holds the data associated with an "add token to automaton" action. */
+export class AddTokenActionData extends ActionData {
+  /** The token created in this action. */
+  public token: TokenWrapper;
+}
+
+/** Holds the data associated with a "remove token from automaton" action. */
+export class RemoveTokenActionData extends ActionData {
+  /** The token removed in this action. */
+  public token: TokenWrapper;
+
+  /**
+   * Transitions using this token at the time of this action, which must
+   * also have the token removed from them.
+   */
+  public transitionsUsingToken: TransitionWrapper[];
+}
+
+/** Holds the data associated with a "set token symbol" action. */
+export class SetTokenSymbolActionData extends ActionData {
+  /** The symbol for this token before this action. */
+  public oldSymbol: string;
+
+  /** The symbol for this token after this action. */
+  public newSymbol: string;
+
+  /** The token modified in this action. */
+  public token: TokenWrapper;
 }

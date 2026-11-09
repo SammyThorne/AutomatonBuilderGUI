@@ -21,6 +21,12 @@ import {
   SetCommentsTextActionData,
   MoveCommentsActionData,
   SetCommentsColorActionData,
+  PasteActionData,
+  CutActionData,
+  CreateCommentActionData,
+  AddTokenActionData,
+  RemoveTokenActionData,
+  SetTokenSymbolActionData,
 } from "./StackableAction";
 
 /**
@@ -2960,67 +2966,4 @@ class SetTransitionAcceptsTokenData extends ActionData {
 
   /** The token added to or removed from the transition in this action. */
   public token: TokenWrapper;
-}
-
-/** Holds the data associated with an "add token to automaton" action. */
-class AddTokenActionData extends ActionData {
-  /** The token created in this action. */
-  public token: TokenWrapper;
-}
-
-/** Holds the data associated with a "remove token from automaton" action. */
-class RemoveTokenActionData extends ActionData {
-  /** The token removed in this action. */
-  public token: TokenWrapper;
-
-  /**
-   * Transitions using this token at the time of this action, which must
-   * also have the token removed from them.
-   */
-  public transitionsUsingToken: TransitionWrapper[];
-}
-
-/** Holds the data associated with a "set token symbol" action. */
-class SetTokenSymbolActionData extends ActionData {
-  /** The symbol for this token before this action. */
-  public oldSymbol: string;
-
-  /** The symbol for this token after this action. */
-  public newSymbol: string;
-
-  /** The token modified in this action. */
-  public token: TokenWrapper;
-}
-
-/** Holds the data associated with a "paste" action. */
-class PasteActionData extends ActionData {
-  /** The nodes created in this action. */
-  public nodes: NodeWrapper[] = [];
-
-  /** The transitions created in this action. */
-  public transitions: TransitionWrapper[] = [];
-}
-
-/** Holds the data associated with a "cut" action. */
-class CutActionData extends ActionData {
-  /** The nodes removed in this action. */
-  public nodes: NodeWrapper[] = [];
-
-  /** The transitions removed in this action. */
-  public transitions: TransitionWrapper[] = [];
-
-  /** Whether any of the nodes removed were the start node. */
-  public wasStartNode: boolean = false;
-}
-
-/** Holds the data associated with a "create comment" action. */
-class CreateCommentActionData extends ActionData {
-  /** The X coordinate where the comment region is created. */
-  public x: number;
-
-  /** The Y coordinate where the comment region is created. */
-  public y: number;
-
-  /** The comment region created in this action. */
-  public commentRegion: CommentRegion;
 }
