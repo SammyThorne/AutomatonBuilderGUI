@@ -19,6 +19,8 @@ import {
   SetNodesIsAcceptActionData,
   ResizeCommentActionData,
   SetCommentsTextActionData,
+  MoveCommentsActionData,
+  SetCommentsColorActionData,
 } from "./StackableAction";
 
 /**
@@ -3021,24 +3023,4 @@ class CreateCommentActionData extends ActionData {
 
   /** The comment region created in this action. */
   public commentRegion: CommentRegion;
-}
-
-/** Holds the data associated with a "move comments" action. */
-class MoveCommentsActionData extends ActionData {
-  /** The amount by which comments were moved in this action. */
-  public delta: Vector2d;
-
-  /** The comments moved in this action. */
-  public comments: CommentRegion[];
-}
-
-/** Holds the data associated with a "set comments color" action. */
-class SetCommentsColorActionData extends ActionData {
-  /** The old colors before the action was taken */
-  public oldColors: string[];
-
-  /** The old color after the action was taken */
-  public newColor: string;
-
-  public comments: CommentRegion[];
 }

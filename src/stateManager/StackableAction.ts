@@ -164,3 +164,23 @@ export class SetCommentsTextActionData extends ActionData {
 
   public comments: CommentRegion[];
 }
+
+/** Holds the data associated with a "move comments" action. */
+export class MoveCommentsActionData extends ActionData {
+  /** The amount by which comments were moved in this action. */
+  public delta: Vector2d;
+
+  /** The comments moved in this action. */
+  public comments: CommentRegion[];
+}
+
+/** Holds the data associated with a "set comments color" action. */
+export class SetCommentsColorActionData extends ActionData {
+  /** The old colors before the action was taken */
+  public oldColors: string[];
+
+  /** The old color after the action was taken */
+  public newColor: string;
+
+  public comments: CommentRegion[];
+}
