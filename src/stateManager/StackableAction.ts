@@ -153,3 +153,14 @@ export class ResizeCommentActionData extends ActionData {
   /** The comment being resized in this action. */
   public comment: CommentRegion;
 }
+
+/** Holds the data associated with a "set comments text" action. */
+export class SetCommentsTextActionData extends ActionData {
+  /** The old texts before the action was taken */
+  public oldTexts: string[];
+
+  /** The old text after the action was taken */
+  public newText: string;
+
+  public comments: CommentRegion[];
+}

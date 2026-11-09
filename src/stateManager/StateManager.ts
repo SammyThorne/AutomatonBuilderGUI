@@ -14,9 +14,12 @@ import { convertIDtoLabelOrSymbol } from "../utilities/AutomatonUtilities";
 import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
 import { Vector2d } from "konva/lib/types";
 import { KonvaEventObject } from "konva/lib/Node";
-import { SetNodesIsAcceptActionData } from "./StackableAction";
-import { StackableAction } from "./StackableAction";
-import { ResizeCommentActionData } from "./StackableAction";
+import {
+  StackableAction,
+  SetNodesIsAcceptActionData,
+  ResizeCommentActionData,
+  SetCommentsTextActionData,
+} from "./StackableAction";
 
 /**
  * The "engine" behind the Automaton Builder GUI. It handles a lot of the
@@ -3036,17 +3039,6 @@ class SetCommentsColorActionData extends ActionData {
 
   /** The old color after the action was taken */
   public newColor: string;
-
-  public comments: CommentRegion[];
-}
-
-/** Holds the data associated with a "set comments text" action. */
-class SetCommentsTextActionData extends ActionData {
-  /** The old texts before the action was taken */
-  public oldTexts: string[];
-
-  /** The old text after the action was taken */
-  public newText: string;
 
   public comments: CommentRegion[];
 }
