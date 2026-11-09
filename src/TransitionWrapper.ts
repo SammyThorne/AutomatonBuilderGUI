@@ -1,9 +1,8 @@
 import Konva from "konva";
 import NodeWrapper from "./NodeWrapper";
 import SelectableObject from "./SelectableObject";
-import StateManager, {
-  SerializableTransition,
-} from "./stateManager/StateManager";
+import StateManager from "./stateManager/StateManager";
+import { SerializableTransition } from "./stateManager/SearilizableInterfaces";
 import { Tool } from "./Tool";
 import TokenWrapper from "./TokenWrapper";
 import { v4 as uuidv4 } from "uuid";

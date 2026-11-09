@@ -249,3 +249,90 @@ export class SetTokenSymbolActionData extends ActionData {
   /** The token modified in this action. */
   public token: TokenWrapper;
 }
+
+/** Holds the data associated with a "create node" action. */
+export class CreateNodeActionData extends ActionData {
+  /** The X coordinate where the node is created. */
+  public x: number;
+
+  /** The Y coordinate where the node is created. */
+  public y: number;
+
+  /** The node created in this action. */
+  public node: NodeWrapper;
+}
+
+/** Holds the data associated with a "remove node" action. */
+export class RemoveNodeActionData extends ActionData {
+  /** The node removed in this action. */
+  public node: NodeWrapper;
+
+  /**
+   * Transitions associated with the node removed in this action, which
+   * also must be removed as part of the action.
+   */
+  public transitions: Set<TransitionWrapper>;
+
+  /**
+   * Whether or not the node removed in this action was the automaton's
+   * start node.
+   */
+  public isStart: boolean;
+}
+
+/** Holds the data associated with a delete all selected objects action. */
+export class RemoveNodeActionDataMulti extends ActionData {
+  /** The nodes removed in this action. */
+  public nodes: NodeWrapper[] = [];
+
+  /** The transitions removed in this action. */
+  public transitions: TransitionWrapper[] = [];
+
+  /** The comment regions removed in this action. */
+  public comments: CommentRegion[] = [];
+
+  /** Whether any of the nodes removed were the start node. */
+  public wasStartNode: boolean = false;
+}
+
+/** Holds the data associated with a "set node name" action. */
+export class SetNodeNameActionData extends ActionData {
+  /** The name of the node before this action. */
+  public oldName: string;
+
+  /** The name of the node after this action. */
+  public newName: string;
+
+  /** The node renamed in this action. */
+  public node: NodeWrapper;
+}
+
+/** Holds the data associated with a "set node as start node" action. */
+export class SetNodeIsStartActionData extends ActionData {
+  /** The node that was the start node before this action. */
+  public oldStart: NodeWrapper;
+
+  /** The node that was the start node after this action. */
+  public newStart: NodeWrapper;
+}
+
+/** Holds the data associated with an "add transition" action. */
+export class AddTransitionActionData extends ActionData {
+  /** The transition created in this action. */
+  public transition: TransitionWrapper;
+}
+
+/** Holds the data associated with a "remove transition" action. */
+export class RemoveTransitionActionData extends ActionData {
+  /** The transition removed in this action. */
+  public transition: TransitionWrapper;
+}
+
+/** Holds the data associated with a "add/remove token to transition" action. */
+export class SetTransitionAcceptsTokenData extends ActionData {
+  /** The transition modified in this action. */
+  public transition: TransitionWrapper;
+
+  /** The token added to or removed from the transition in this action. */
+  public token: TokenWrapper;
+}

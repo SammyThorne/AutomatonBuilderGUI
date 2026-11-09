@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { SerializableToken } from "./stateManager/StateManager";
+import { SerializableToken } from "./stateManager/SearilizableInterfaces";
 
 /**
  * The class that holds token information and acts as a persistent reference
