@@ -12,6 +12,7 @@ import DFATransition from "automaton-kit/lib/dfa/DFATransition";
 import DFAState from "automaton-kit/lib/dfa/DFAState";
 import { convertIDtoLabelOrSymbol } from "../utilities/AutomatonUtilities";
 import UndoRedoManager, { Action, ActionData } from "../UndoRedoManager";
+import { exportAutomatonToImage } from "./ExportFile";
 import { Vector2d } from "konva/lib/types";
 import { KonvaEventObject } from "konva/lib/Node";
 import {
@@ -461,67 +462,18 @@ export default class StateManager {
     };
   }
 
+  /** Exports the diagram as a PNG. Thin wrapper that hands private state to ExportFile. */
+  /** Now lives in the ExportFile.ts under Components **/
   public static exportAutomatonToImage() {
-    if (!StateManager._stage) {
-      console.error("error: _stage is not initialized");
-      return;
-    }
-    const originalScale = StateManager._stage.scale();
-    const originalPosition = StateManager._stage.position();
-
-    StateManager._stage.scale({ x: 1, y: 1 });
-    StateManager._stage.position({ x: 0, y: 0 });
-    StateManager._stage.batchDraw();
-
-    StateManager.transitions.forEach((transition) => {
-      transition.updatePoints();
-      if (!transition.konvaGroup.getParent()) {
-        StateManager._transitionLayer.add(transition.konvaGroup);
-      }
+    exportAutomatonToImage({
+      stage: StateManager._stage,
+      gridLayer: StateManager._gridLayer,
+      nodeLayer: StateManager._nodeLayer,
+      transitionLayer: StateManager._transitionLayer,
+      transitions: StateManager.transitions,
+      bounds: StateManager.getDiagramBounds(),
+      useDarkMode: StateManager.useDarkMode,
     });
-
-    StateManager._gridLayer.batchDraw();
-    StateManager._nodeLayer.batchDraw();
-    StateManager._transitionLayer.batchDraw();
-
-    const bounds = StateManager.getDiagramBounds();
-
-    // Set background based on dark/light mode.
-    const background: Konva.Rect = new Konva.Rect({
-      x: bounds.x,
-      y: bounds.y,
-      width: bounds.width,
-      height: bounds.height,
-      fill: StateManager.useDarkMode ? "black" : "white",
-      listening: false,
-    });
-
-    StateManager._gridLayer.add(background);
-    StateManager._gridLayer.moveToBottom();
-    StateManager._gridLayer.batchDraw();
-
-    const dataURL = StateManager._stage.toDataURL({
-      mimeType: "image/png",
-      pixelRatio: 2,
-      x: bounds.x,
-      y: bounds.y,
-      width: bounds.width,
-      height: bounds.height,
-    });
-
-    background.destroy();
-    StateManager._gridLayer.batchDraw();
-
-    StateManager._stage.scale(originalScale);
-    StateManager._stage.position(originalPosition);
-    StateManager._stage.batchDraw();
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = dataURL;
-    downloadLink.download = "diagram.png";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
   }
 
   /** Gets the current tool. */
