@@ -5,6 +5,11 @@ import { useRef } from "react";
 import { useState } from "react";
 import { ChangeEvent } from "react";
 import {
+  uploadJSON,
+  downloadJSON,
+  loadAutomaton,
+} from "../stateManager/ExportFile";
+import {
   BsCursor,
   BsCursorFill,
   BsPip,
@@ -148,7 +153,7 @@ export default function Toolbox(props: React.PropsWithChildren<ToolboxProps>) {
   };
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    StateManager.uploadJSON(e)
+    uploadJSON(e)
       .then((parsedData) => {
         const automatonCheck = StateManager.isValidAutomaton(parsedData);
         if (automatonCheck[0] == false) {
@@ -156,7 +161,7 @@ export default function Toolbox(props: React.PropsWithChildren<ToolboxProps>) {
           return;
         }
 
-        StateManager.loadAutomaton(parsedData);
+        loadAutomaton(parsedData);
       })
       .catch((response) => {
         showError("The file does not contain valid JSON.");
@@ -254,7 +259,7 @@ export default function Toolbox(props: React.PropsWithChildren<ToolboxProps>) {
         ></ActionButton>
 
         <ActionButton
-          onClick={StateManager.downloadJSON}
+          onClick={downloadJSON}
           icon={<BsDownload />}
           title="Download from JSON"
           bgColor="bg-amber-500"

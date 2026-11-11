@@ -1,6 +1,10 @@
 import Konva from "konva";
 import TransitionWrapper from "../TransitionWrapper";
-
+import { ChangeEvent } from "react";
+import StateManager from "./StateManager";
+import { SerializableAutomaton } from "./SearilizableInterfaces";
+import TokenWrapper from "../TokenWrapper";
+import NodeWrapper from "../NodeWrapper";
 /** Everything the export needs from StateManager, supplied by the caller. */
 export interface ExportContext {
   stage: Konva.Stage | null;
@@ -72,4 +76,113 @@ export function exportAutomatonToImage(ctx: ExportContext) {
   document.body.appendChild(downloadLink);
   downloadLink.click();
   document.body.removeChild(downloadLink);
+}
+
+/**
+ * Converts the current automaton to a JSON file, and downloads it to the
+ * user's device.
+ */
+export function downloadJSON() {
+  StateManager.makeClean();
+
+  const jsonString = JSON.stringify(StateManager.toSerializable(), null, 4);
+
+  // A hacky solution in my opinion, but apparently it works so hey.
+  // Adapted from https://stackoverflow.com/a/18197341
+
+  let el = document.createElement("a");
+  el.setAttribute(
+    "href",
+    "data:text/plain;charset=utf-8," + encodeURIComponent(jsonString),
+  );
+  el.setAttribute("download", "finite_automaton.json");
+  el.style.display = "none";
+  document.body.appendChild(el);
+  el.click();
+  document.body.removeChild(el);
+}
+
+/**
+ * Attempts to load an automaton JSON from a user's file.
+ * @param ev
+ */
+export function uploadJSON(ev: ChangeEvent<HTMLInputElement>) {
+  const file = ev.target.files.item(0);
+  ev.target.value = null;
+
+  const fileText = file.text().then(
+    (text: string): any => {
+      return JSON.parse(text);
+    },
+    (reject_reason: any): any => {
+      console.error("could not get file text, reason was", reject_reason);
+      return null;
+    },
+  );
+
+  return fileText;
+}
+
+/**
+ * Loads the data from a deserialized JSON automaton representation
+ * into the program.
+ * @param json The deserialized JSON object to load.
+ */
+export function loadAutomaton(json: SerializableAutomaton) {
+  const { states, alphabet, transitions, startState, acceptStates } = json;
+
+  StateManager.clearMachine();
+  StateManager.makeClean();
+
+  // Load each state
+  states.forEach((state) => {
+    const newState = new NodeWrapper(state.label, state.id);
+    newState.createKonvaObjects(state.x, state.y);
+    StateManager.addNode(newState);
+  });
+
+  acceptStates.forEach((state) => {
+    const node = StateManager.findNodeById(state);
+    if (node) {
+      node.isAcceptNode = true;
+    }
+  });
+
+  // Load the alphabet
+  alphabet.forEach((tok) => {
+    const newTok = new TokenWrapper(tok.symbol, tok.id);
+    StateManager.pushAlphabetToken(newTok);
+  });
+
+  // Load transitions
+  transitions.forEach((trans) => {
+    const src = StateManager.findNodeById(trans.source);
+    const dest = StateManager.findNodeById(trans.dest);
+    const isEpsilonTransition = trans.isEpsilonTransition;
+    const tokens = trans.tokens.map((tokID) =>
+      StateManager.findTokenById(tokID),
+    );
+    const newTrans = new TransitionWrapper(
+      src,
+      dest,
+      isEpsilonTransition,
+      tokens,
+    );
+
+    StateManager.addStateTransition(newTrans);
+  });
+
+  // Load the start state
+  const startNodeObj = StateManager.findNodeById(startState);
+  if (!startNodeObj) {
+    console.error("Start state not found!!");
+  } else {
+    StateManager.startNode = startNodeObj;
+  }
+
+  // Accept states are loaded at the same time as states themselves
+
+  // Refresh canvas?
+
+  StateManager.redraw();
 }

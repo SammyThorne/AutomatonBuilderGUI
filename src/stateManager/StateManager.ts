@@ -5,7 +5,6 @@ import Konva from "konva";
 import TransitionWrapper from "../TransitionWrapper";
 import SelectableObject from "../SelectableObject";
 import TokenWrapper from "../TokenWrapper";
-import { ChangeEvent } from "react";
 import { LightColorScheme, DarkColorScheme } from "../ColorSchemes";
 import DFA from "automaton-kit/lib/dfa/DFA";
 import DFATransition from "automaton-kit/lib/dfa/DFATransition";
@@ -179,6 +178,32 @@ export default class StateManager {
     }
 
     StateManager.debugActive = !StateManager.debugActive;
+  }
+
+  static addNode(node: NodeWrapper) {
+    this._nodeWrappers.push(node);
+    this._nodeLayer.add(node.nodeGroup);
+  }
+
+  static findNodeById(id: string) {
+    return this._nodeWrappers.find((n) => n.id === id);
+  }
+
+  static addStateTransition(t: TransitionWrapper) {
+    this._transitionWrappers.push(t);
+    this._transitionLayer.add(t.konvaGroup);
+  }
+
+  static findTokenById(tokId: string): TokenWrapper | undefined {
+    return this._alphabet.find((tok) => tok.id === tokId);
+  }
+
+  static pushAlphabetToken(token: TokenWrapper) {
+    this._alphabet.push(token);
+  }
+
+  static redraw() {
+    this._stage?.draw();
   }
 
   static notifyListeners() {
@@ -2399,119 +2424,6 @@ export default class StateManager {
         .filter((node) => node.isAcceptNode)
         .map((node) => node.id),
     };
-  }
-
-  /**
-   * Converts the current automaton to a JSON file, and downloads it to the
-   * user's device.
-   */
-  public static downloadJSON() {
-    StateManager.makeClean();
-
-    const jsonString = JSON.stringify(StateManager.toSerializable(), null, 4);
-
-    // A hacky solution in my opinion, but apparently it works so hey.
-    // Adapted from https://stackoverflow.com/a/18197341
-
-    let el = document.createElement("a");
-    el.setAttribute(
-      "href",
-      "data:text/plain;charset=utf-8," + encodeURIComponent(jsonString),
-    );
-    el.setAttribute("download", "finite_automaton.json");
-    el.style.display = "none";
-    document.body.appendChild(el);
-    el.click();
-    document.body.removeChild(el);
-  }
-
-  /**
-   * Attempts to load an automaton JSON from a user's file.
-   * @param ev
-   */
-  public static uploadJSON(ev: ChangeEvent<HTMLInputElement>) {
-    const file = ev.target.files.item(0);
-    ev.target.value = null;
-
-    const fileText = file.text().then(
-      (text: string): any => {
-        return JSON.parse(text);
-      },
-      (reject_reason: any): any => {
-        console.error("could not get file text, reason was", reject_reason);
-        return null;
-      },
-    );
-
-    return fileText;
-  }
-
-  /**
-   * Loads the data from a deserialized JSON automaton representation
-   * into the program.
-   * @param json The deserialized JSON object to load.
-   */
-  public static loadAutomaton(json: SerializableAutomaton) {
-    const { states, alphabet, transitions, startState, acceptStates } = json;
-
-    StateManager.clearMachine();
-    StateManager.makeClean();
-
-    // Load each state
-    states.forEach((state) => {
-      const newState = new NodeWrapper(state.label, state.id);
-      newState.createKonvaObjects(state.x, state.y);
-      StateManager._nodeWrappers.push(newState);
-      StateManager._nodeLayer.add(newState.nodeGroup);
-    });
-
-    acceptStates.forEach((state) => {
-      const node = StateManager._nodeWrappers.find((n) => n.id === state);
-      if (node) {
-        node.isAcceptNode = true;
-      }
-    });
-
-    // Load the alphabet
-    alphabet.forEach((tok) => {
-      const newTok = new TokenWrapper(tok.symbol, tok.id);
-      StateManager._alphabet.push(newTok);
-    });
-
-    // Load transitions
-    transitions.forEach((trans) => {
-      const src = StateManager._nodeWrappers.find((n) => n.id === trans.source);
-      const dest = StateManager._nodeWrappers.find((n) => n.id === trans.dest);
-      const isEpsilonTransition = trans.isEpsilonTransition;
-      const tokens = trans.tokens.map((tokID) =>
-        StateManager._alphabet.find((tok) => tok.id === tokID),
-      );
-      const newTrans = new TransitionWrapper(
-        src,
-        dest,
-        isEpsilonTransition,
-        tokens,
-      );
-
-      StateManager._transitionWrappers.push(newTrans);
-      StateManager._transitionLayer.add(newTrans.konvaGroup);
-    });
-
-    // Load the start state
-    const startNodeObj = StateManager._nodeWrappers.filter(
-      (n) => n.id === startState,
-    );
-    if (startNodeObj.length <= 0) {
-      console.error("Start state not found!!");
-    } else {
-      StateManager.startNode = startNodeObj[0];
-    }
-
-    // Accept states are loaded at the same time as states themselves
-
-    // Refresh canvas?
-
-    this._stage.draw();
   }
 
   public static isValidAutomaton(

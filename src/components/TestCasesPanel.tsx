@@ -11,6 +11,7 @@ import {
 import { BiTestTube } from "react-icons/bi";
 import FloatingPanel from "./FloatingPanel";
 import ErrorDialogBox from "./ErrorDialogBox";
+import { uploadJSON } from "../stateManager/ExportFile";
 
 export default function TestCasesPanel() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,7 +44,7 @@ export default function TestCasesPanel() {
   };
 
   const handleTestsFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-    StateManager.uploadJSON(e)
+    uploadJSON(e)
       .then((parsedData) => {
         let i = 0;
         let arr = [];
